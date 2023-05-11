@@ -128,4 +128,21 @@ export const actions = {
         });
     });
   },
+
+  //get list all products
+  getListAllProducts({ commit, state }, payload) {
+    //set promise
+    return new Promise((resolve, reject) => {
+      //fetching Rest API "/api/products" with method "GET"
+      this.$axios
+        .get("/api/list-products")
+        //success
+        .then((response) => {
+          //commit ti mutation "SET_PRODUCTS_DATA"
+          commit("SET_PRODUCTS_DATA", response.data.data);
+          //resolve promise
+          resolve();
+        });
+    });
+  },
 };

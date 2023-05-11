@@ -25,8 +25,8 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:products',
-            'price' => 'required',
-            'stock' => 'required',
+            'price' => 'required|numeric|min:1',
+            'stock' => 'required|numeric|min:1',
             'description' => 'required',
         ]);
 
@@ -41,6 +41,7 @@ class ProductController extends Controller
             'stock' => $request->stock,
             'description' => $request->description,
         ]);
+
         if ($product) {
             //return success with Api Resource
             return new ProductResource(true, 'Data Product Berhasil Disimpan!', $product);
@@ -95,5 +96,14 @@ class ProductController extends Controller
         }
         //return failed with Api Resource
         return new ProductResource(false, 'Data Product Gagal Dihapus!', null);
+    }
+
+    public function getList()
+    {
+        //get products
+        $products = Product::all();
+
+        //return with Api Resource
+        return new ProductResource(true, 'List Data Products', $products);
     }
 }

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 //route login
 Route::post('/login', [App\Http\Controllers\Api\LoginController::class, 'index', ['as' => 'admin']]);
+Route::post('/register', [App\Http\Controllers\Api\RegisterController::class, 'store']);
 
 //group route with middleware "auth:api_admin"
 Route::group(['middleware' => 'auth:api_admin'], function () {
@@ -36,3 +37,5 @@ Route::group(['middleware' => 'auth:api_admin'], function () {
 
     Route::apiResource('/transactions', App\Http\Controllers\Api\TransactionController::class, ['except' => ['create'], 'as' => 'admin']);
 });
+
+Route::get('/list-products', [App\Http\Controllers\Api\ProductController::class, 'getList']);

@@ -26,7 +26,7 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'quantity' => 'required|min:1',
+            'quantity' => 'required|numeric|min:1',
             'product_id' => 'required',
         ]);
 
@@ -47,6 +47,10 @@ class TransactionController extends Controller
 
         $getRefNo = $jsonResponse->data;
 
+        if ($product->stock == 0) {
+            return response()->json(["message" => "Stock kurang!"], 422);
+        }
+
         if ($request->quantity > $product->stock) {
             return response()->json(["message" => "Quantity melebihi stok!"], 422);
         }
@@ -60,8 +64,12 @@ class TransactionController extends Controller
             'payment_amount' => $product->price * $request->quantity
         ]);
 
-
         if ($transaction) {
+            $p = Product::whereId($transaction->product_id)->first();
+            $p->update([
+                'stock' => $p->stock - $request->quantity,
+            ]);
+
             //return success with Api Resource
             return new TransactionResource(true, 'Data Transaction Berhasil Disimpan!', $transaction);
         }
@@ -70,10 +78,9 @@ class TransactionController extends Controller
         return new TransactionResource(false, 'Data Transaction Gagal Disimpan!', null);
     }
 
-
     public function show($id)
     {
-        $transaction = Transaction::whereId($id)->first();
+        $transaction = Transaction::with('product')->whereId($id)->first();
         if ($transaction) {
             //return success with Api Resource
             return new TransactionResource(true, 'Detail Data Transaction!', $transaction);
